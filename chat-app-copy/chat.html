@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>School Management App</title>
+        <script type="importmap">
+            {
+                "imports": {
+                    "vue": "https://cdn.jsdelivr.net/npm/vue@3.5.32/dist/vue.esm-browser.js",
+                    "@graffiti-garden/implementation-local": "https://cdn.jsdelivr.net/npm/@graffiti-garden/implementation-local@1.2.0/dist/browser/index.js",
+                    "@graffiti-garden/implementation-decentralized": "https://cdn.jsdelivr.net/npm/@graffiti-garden/implementation-decentralized@0.0.9/dist/browser/index.js",
+                    "@graffiti-garden/wrapper-vue": "https://cdn.jsdelivr.net/npm/@graffiti-garden/wrapper-vue@1.2.2/dist/browser/plugin.mjs"
+                }
+            }
+        </script>
+        <script src="index.js" type="module"></script>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="app">Loading...</div>
+        <template id="template">
+            <div v-if="inChat">
+                <button @click="toggleMode()">
+                    back
+                </button>
+            </div>
+            <div v-else>
+                <button v-if="!$graffitiSession.value" @click="$graffiti.login()">
+                    Log In
+                </button>
+                <div v-else>
+                    <button @click="$graffiti.logout($graffitiSession.value)">
+                        Log Out
+                    </button>
+                </div>
+            </div>
+
+            <div v-if="inChat">
+                
+            </div>
+            <ul v-else>
+                <form @submit.prevent="newChat()">
+                    <input
+                        type="text"
+                        v-model="myChatName"
+                        placeholder="Chat Name"
+                    />
+                    <input
+                        type="submit"
+                        :value="'New Chat'"
+                        :disabled="!myChatName || isSending"
+                    />
+                </form>
+                <div class="sideScroll">
+                    <li v-for="object of chats" :key="object.url">
+                        <button @click="switchChats(object)">
+                            {{ object.value.title }}
+                        </button>
+                    </li>
+                </div>
+            </ul>
+
+            <div v-if="!inChat">
+
+            </div>
+            <div v-else>
+                <p v-if="areMessageObjectsLoading">
+                    <em>Loading messages...</em>
+                </p>
+                <ul v-else class="vertScroll">
+                    <li v-for="object of sortedMessageObjects" :key="object.url">
+                        
+                        <p :class="{ mine: object.actor===$graffitiSession.value?.actor }" class="theirs">
+                            {{ object.value.content }} 
+                        </p>
+                        <button
+                            v-if="object.actor===$graffitiSession.value?.actor"
+                            @click="deleteMessage(object)"
+                            :disabled="isDeleting.has(object.url)"
+                            class="delete"
+                        >
+                            {{ isDeleting.has(object.url) ? "Deleting..." : "Delete"
+                            }}
+                        </button>
+                    </li>
+                </ul>
+                <button v-if="!$graffitiSession.value" @click="$graffiti.login()">
+                    Log In
+                </button>
+                <template v-else>
+                    <button @click="$graffiti.logout($graffitiSession.value)">
+                        Log Out
+                    </button>
+                    <form @submit.prevent="sendMessage()">
+                        <input
+                            type="text"
+                            v-model="myMessage"
+                            placeholder="Message"
+                        />
+                        <input
+                            type="submit"
+                            :value="isSending ? 'Sending...' : 'Send'"
+                            :disabled="!myMessage || isSending"
+                        />
+                    </form>
+                </template>
+            </div>
+        </template>
+
+        
+    </body>
+</html>

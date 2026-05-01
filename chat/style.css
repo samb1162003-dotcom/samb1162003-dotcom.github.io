@@ -1,0 +1,47 @@
+.mine.theirs {
+    background-image: linear-gradient(to right, white 80%, lightblue 10%);
+    min-height: fit-content;
+    padding-left: 80%;
+}
+
+.delete {
+    margin-left: 80%;
+}
+
+.theirs {
+    background-color: lightgreen;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    width: 20%;
+}
+
+ul {
+    list-style-type: none;
+    width: 100%;
+}
+
+li {
+    width: 90%;
+}
+
+.sideScroll {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    max-height: 15vh;
+    max-width: 70vw;
+}
+
+
+.vertScroll {
+    max-height: 85vh;
+    max-width: 100vw;
+    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+}
