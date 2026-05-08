@@ -1,5 +1,4 @@
-import { createApp, defineAsyncComponent, ref, computed } from "vue";
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createApp, ref, computed } from "vue";
 import { GraffitiLocal } from "@graffiti-garden/implementation-local";
 import { GraffitiDecentralized } from "@graffiti-garden/implementation-decentralized";
 import {
@@ -8,37 +7,6 @@ import {
   useGraffitiSession,
   useGraffitiDiscover,
 } from "@graffiti-garden/wrapper-vue";
-
-function loadComponent(name) {
-  return () => import(`./${name}/main.js`).then((m) => m.default());
-}
-
-const router = createRouter({
-  history: createWebHashHistory(),
-  routes: [
-    { path: "/home", component: loadComponent("home") },
-    { path: "/chat", component: loadComponent("chat"), props: true },
-    { path: "/profile", component: loadComponent("profile"), props: true },
-  ],
-});
-
-createApp({
-  template: "#template",
-  components: {
-    Home: defineAsyncComponent(loadComponent("home")),
-  },
-})
-  .use(router)
-  .use(GraffitiPlugin, {
-    // graffiti: new GraffitiLocal(),
-    graffiti: new GraffitiDecentralized(),
-  })
-  .mount("#app");
-
-
-const App = { template: "#template", setup };
-
-
 
 function setup() {
   // Initialize Graffiti
@@ -79,28 +47,23 @@ function setup() {
     });
   });
 
-  let { objects: chats } = 
-    useGraffitiDiscover(
-      ["designftw-26"],
-      {
-        properties: {
-          value: {
-            required: ["activity", "type", "channel", "title", "published"],
-            properties: {
-              activity: { const: "Create" },
-              type: { const: "Chat" },
-              channel: { type: "string" },
-              title: { type: "string" },
-              published: { type: "number" },
-            },
+  const { objects: chats } = useGraffitiDiscover(
+    ["designftw-26"],
+    {
+      properties: {
+        value: {
+          required: ["activity", "type", "channel", "title", "published"],
+          properties: {
+            activity: { const: "Create" },
+            type: { const: "Chat" },
+            channel: { type: "string" },
+            title: { type: "string" },
+            published: { type: "number" },
           },
         },
-      },
-      undefined, // Don't look for private messages
-      true, // Automatically poll for new messages (realtime)
-    );
-
-
+      }
+    }
+  )
 
   async function newChat() {
     await graffiti.post(
@@ -109,14 +72,14 @@ function setup() {
           activity: "Create",
           type: "Chat",
           channel: crypto.randomUUID(),
-          title: myChatName.value, // TODO: let the user specify this
+          title: myChatName.value,
           published: Date.now(),
         },
         channels: ["designftw-26"],
+        allowed: [],
       },
       session.value,
     );
-    myChatName.value = "";
   }
 
   // A function to send a message.
@@ -183,3 +146,12 @@ function setup() {
     inChat,
   };
 }
+
+const App = { template: "#template", setup };
+
+createApp(App)
+  .use(GraffitiPlugin, {
+    // graffiti: new GraffitiLocal(),
+    graffiti: new GraffitiDecentralized(),
+  })
+  .mount("#app");
