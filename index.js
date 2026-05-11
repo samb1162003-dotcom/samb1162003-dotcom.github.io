@@ -21,6 +21,7 @@ function setup() {
   const myMessage = ref("");
   const myChatName = ref("");
 
+
   // "Discover" messages in the chat
   const { objects: messageObjects, isFirstPoll: areMessageObjectsLoading } =
     useGraffitiDiscover(
@@ -65,6 +66,7 @@ function setup() {
     }
   )
 
+
   async function newChat() {
     await graffiti.post(
       {
@@ -81,6 +83,17 @@ function setup() {
       session.value,
     );
   }
+
+  async function getUsers() {
+    const users = new Set([]);
+    for (let i = 0; i < sortedMessageObjects.value.length; i++) {
+      users.add(sortedMessageObjects.value[i].actor);
+    }
+    return users;
+  }
+
+  const { objects: users } = getUsers();
+
 
   // A function to send a message.
   // Since the function is async, we
@@ -104,11 +117,13 @@ function setup() {
     } finally {
       isSending.value = false;
     }
+    getUsers();
   }
 
   async function switchChats(obj) {
     inChat.value = !inChat.value;
     channel.value = obj.value.channel;
+    getUsers();
   }
 
   // A function to delete a message.

@@ -20,6 +20,18 @@
     <body>
         <div id="app">Loading...</div>
         <template id="template">
+            <div v-if="!inChat">
+                <button v-if="!$graffitiSession.value" @click="$graffiti.login()">
+                    Log In
+                </button>
+                <button v-else @click="$graffiti.logout($graffitiSession.value)">
+                    Log Out
+                </button>
+            </div>
+            <div v-else>
+
+            </div>
+
             <div v-if="inChat">
                 <button @click="toggleMode()">
                     back
@@ -48,6 +60,9 @@
                     />
                 </form>
                 <div class="sideScroll">
+                    <li v-for="user of users" class="chat" draggable="true">
+                        hi
+                    </li>
                     <li v-for="object of chats" :key="object.url" class="chat" draggable="true">
                         <button @click="switchChats(object)">
                             {{ object.value.title }}
@@ -80,13 +95,7 @@
                         </button>
                     </li>
                 </ul>
-                <button v-if="!$graffitiSession.value" @click="$graffiti.login()">
-                    Log In
-                </button>
-                <template v-else>
-                    <button @click="$graffiti.logout($graffitiSession.value)">
-                        Log Out
-                    </button>
+                <template v-if="$graffitiSession.value">
                     <form @submit.prevent="sendMessage()">
                         <input
                             type="text"
